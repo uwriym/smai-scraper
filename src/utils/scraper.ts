@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises'
+import * as path from 'path'
 import { SmaiScraper } from 'src/utils/import'
 import { ParseOptionsDto } from 'src/bot/dto/parse-options.dto'
 import { convertToKebabCase } from 'src/utils/etc'
@@ -14,11 +15,11 @@ export async function createScraperInstance<T extends SmaiScraper>(
   scraperName: string,
 ) {
   // scraperName example: 'SmCalendarScraper'
-  const scraperFileName = convertToKebabCase(scraperName)
-  const scraperFilePath = `src/scrapers/${scraperFileName}.ts`
+  const scraperFileName = convertToKebabCase(scraperName);
+  const scraperFilePath = path.join(__dirname, '../scrapers', scraperFileName);
 
-  const module = await import(scraperFilePath)
-  const scraperClass = module[scraperName] as { new (): T }
+  const module = await import(scraperFilePath);
+  const scraperClass = module[scraperName] as { new (): T };
 
   return new scraperClass()
 }
