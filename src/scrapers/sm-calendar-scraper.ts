@@ -39,7 +39,6 @@ export class SmCalendarScraper implements SmaiScraper {
 
     for (const calendarData of calendarDataList) {
       const dataObject: SmCalendarDto = {
-        scraperName: this.constructor.name,
         title: calendarData['articleTitle'],
         startDate: calendarData['etcChar6'],
         endDate: calendarData['etcChar7'],
@@ -49,7 +48,11 @@ export class SmCalendarScraper implements SmaiScraper {
       dataList.push(dataObject)
     }
 
-    await saveData(dataList)
+    await saveData({
+      data: dataList,
+      format: 'json',
+      saveDir: 'sm-calendar',
+    })
   }
 
   async fetchSmCalendar(cookieString: string) {
