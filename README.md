@@ -31,5 +31,5 @@ npm run console
 
 ```bash
 import { startBot } from 'src/utils/scraper'
-startBot({ scraperName: 'MomCookingScraper' })
+startBot({ scraperName: 'SmCalendarScraper' })
 ```
