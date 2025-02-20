@@ -39,42 +39,45 @@ export async function startBot(parseOptions: ParseOptionsDto) {
   return true
 }
 
-// 디렉토리 생성 (Promise 반환)
-async function createDirectory(dirPath: string): Promise<void> {
+async function createDir(dirPath: string): Promise<void> {
   try {
     await fs.mkdir(dirPath, { recursive: true }) // recursive 옵션 추가
-    console.log(`${dirPath} 디렉토리를 생성했습니다.`)
   } catch (error) {
-    console.error(`${dirPath} 디렉토리 생성 중 오류가 발생했습니다:`, error)
-    throw error // 오류를 다시 던져서 상위 함수에서 처리하도록 함
+    console.error(`[createDir] Error: ${error}`)
+    throw error
   }
 }
 
-// 파일 생성 (Promise 반환)
-async function createFile(filePath: string, data: any): Promise<void> {
+async function createFile(filePath: string, data: any): Promise<string> {
   try {
     const jsonData = JSON.stringify(data, null, 2)
     await fs.writeFile(filePath, jsonData)
-    console.log(`${filePath} 파일을 생성했습니다.`)
+    return filePath
   } catch (error) {
-    console.error(`${filePath} 파일 생성 중 오류가 발생했습니다:`, error)
-    throw error // 오류를 다시 던져서 상위 함수에서 처리하도록 함
+    console.error(`[createFile] Error: ${error}`)
+    throw error
   }
 }
 
-// 메인 함수 (async)
-export async function saveData(data: any): Promise<boolean> {
-  const scraperName = data['scraperName']
-  const dirPath = `data/${scraperName}`
+export async function saveData({
+  data,
+  format = 'json',
+  saveDir,
+}: {
+  data: any
+  format?: string
+  saveDir: string
+}): Promise<boolean> {
+  const dirPath = `data/${saveDir}`
   const filePath = `${dirPath}/${getDataFileName()}.json`
 
   try {
-    await createDirectory(dirPath) // await 사용
-    await createFile(filePath, data) // await 사용
-    console.log('Data saved:', data)
+    await createDir(dirPath)
+    const createdFilePath = await createFile(filePath, data)
+    console.log(`[saveData] ${format} data saved: ${createdFilePath}`)
     return true
   } catch (error) {
-    console.error('데이터 저장 중 오류가 발생했습니다:', error)
+    console.error('[saveData] Error:', error)
     return false
   }
 }
@@ -89,5 +92,5 @@ function getDataFileName() {
   const seconds = String(now.getSeconds()).padStart(2, '0')
 
   const formattedDateTime = `${year}${month}${day}-${hours}${minutes}${seconds}`
-  return `my-file-${formattedDateTime}.json`
+  return `${formattedDateTime}`
 }
